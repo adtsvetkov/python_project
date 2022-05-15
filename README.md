@@ -36,7 +36,21 @@ https://drive.google.com/drive/folders/1avndVCk5B11ziDMgiSLS7m3qxczAxOmm?usp=sha
 
 ## Made works
 
-Made works step by step you can find in `project.ipynb` file.
+Made works step by step you can find in source files. How to run the algorithm?
+
+### Jupyter Notebook
+Open `Jupyter Notebook` file **project.ipynb**, run step by step.
+### Python file
+```{python}
+$ git clone https://github.com/adtsvetkov/signals
+$ cd signals
+$ git checkout develop
+$ pip install -r requirements.txt
+$ python biglab.py
+```
+**Note:** in `Jupyter Notebook` is recommended to use `Python v.3.8.4+`.   
+`.py`-file was correctly working on `Python v.3.9.4`.  
+Test data are also placed in `data`-folder.
 
 ## References
 
