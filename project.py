@@ -17,7 +17,7 @@ no_path = "data/no"
 yes_path = "data/yes"
 
 
-# считывание изображений
+# pictures reading
 def read_images(folder):
     images = []
     for filename in os.listdir(folder):
@@ -27,7 +27,7 @@ def read_images(folder):
     return images
 
 
-# фильтр Canny
+# Canny filter
 def get_canny(img):
     a_gray = rgb2gray(img)
     a_blur = gaussian(a_gray, 1)
@@ -35,7 +35,7 @@ def get_canny(img):
     return a_edges
 
 
-# получение прямых с помощью преобразования Хафа
+# getting straight lines using Hough transform
 def get_hough_transform(img):
     canny_img = get_canny(img)
     h, theta, d = hough_line(canny_img)
@@ -50,12 +50,12 @@ def get_hough_transform(img):
         y1 = (dist - x1 * np.cos(angle)) / np.sin(angle)
         lines.append((angle, dist, (x0, y0), (x1, y1)))
 
-    # сортируем по местоположению по высоте внутри изображения
+    # sorting lines by place inside the image (by height)
     lines = sorted(lines, key=lambda x: abs(x[1]), reverse=True)
     return lines
 
 
-# отрисовка преобразования Хафа
+# painting Hough transform
 def show_hough(image, lines):
     fig, ax = plt.subplots(1, 2, figsize=(15, 6))
 
@@ -79,29 +79,27 @@ ALLOWED_DISTANCE = 400
 ALLOWED_TURN = 0.2
 
 
-# функция определения близости прямых
+# function for finding the closeness of straight lines
 
 def find_outlier(elem, array):
     flag = 0
     for a in array:
         if abs(abs(int(a[1])) - abs(int(elem[1]))) > ALLOWED_DISTANCE:
             flag += 1
-    # вычитаем единицу из-за того, что elem тоже находится в array
+    # we subtract 1 because 'elem' is also inside the array
     if flag == len(array) - 1:
-        # если линия еще и самая нижняя, считаем ее куском пола
+        # if the line is also the lowest one, the think it is a piece of the floor
         if elem == array[0]:
             return False
     return True
 
-
-# определение и удаление резкого пересечения прямых внутри изображения
-# на предложенном датасете функция не понадобится
+# finding and deleting sharp intersection of lines inside the picture
 
 def find_intersection(elem, array, img):
     height, width = img.shape[:2]
     for a in array:
         if abs(abs(int(elem[0])) - abs(int(a[0]))) > ALLOWED_TURN:
-            # проверяем, лежит ли пересечение внутри изображения
+            # check if intersection is inside the picture
             line1 = LineString([a[2], a[3]])
             line2 = LineString([elem[2], elem[3]])
             inter = line1.intersection(line2)
@@ -113,24 +111,24 @@ def find_intersection(elem, array, img):
     return None
 
 
-# удаление лишних прямых, полученных преобразованием Хафа
+# deleting extra lines found by Hough Transform
 def remove_noise(line_peaks, img):
     new_lines = line_peaks.copy()
 
-    # удаляем прямые по углу поворота
+    # deleting the line by angle of rotation
     for line in line_peaks:
         if abs(line[0]) <= ALLOWED_ANGLE:
             new_lines.remove(line)
 
     lines_copy = new_lines.copy()
 
-    # удаляем прямые плинтуса/кафеля
+    # deleting the lines of plith or tile
     for line in line_peaks:
         if line in new_lines:
             if not find_outlier(line, lines_copy):
                 new_lines.remove(line)
 
-    # убираем оставшиеся пересекающиеся прямые
+    # deleting intersected lines
     for line in line_peaks:
         if line in new_lines:
             inter = find_intersection(line, new_lines, img)
@@ -143,8 +141,7 @@ def remove_noise(line_peaks, img):
 LILAC_MIN = np.array([60, 50, 41], np.uint8)
 LILAC_MAX = np.array([179, 255, 255], np.uint8)
 
-
-# поиск наибольшего объекта маски бинаризации по оттенкам сиреневого
+# searching the biggest contour of binarization mask by lilac
 def get_mask(img):
     hsv_img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
@@ -154,7 +151,7 @@ def get_mask(img):
     img_segment = binary_fill_holes(mask)
     mask_img = binary_opening(img_segment, iterations=30)
 
-    # возьмем наибольший, а остальные удалим
+    # we choose the biggest one and delete others
 
     int_mask = label(mask_img)
     regions = regionprops(int_mask)
@@ -168,14 +165,13 @@ def get_mask(img):
 
     return int_mask
 
-
-# получение экстремальных точек и ограничивающего прямоугольника таза
+# finding extreme points and bouning box of bowl
 def get_bowl_properties(mask):
     contours, _ = cv.findContours(mask, 1, 2)
     cnt = contours[0]
-    # ограничивающий прямоугольник
+    # bounding box
     rect = cv.minAreaRect(cnt)
-    # верхняя и нижняя экстремальные точки
+    # top and down extreme points
     max_p = tuple(cnt[cnt[:, :, 1].argmin()][0])
     min_p = tuple(cnt[cnt[:, :, 1].argmax()][0])
 
@@ -185,7 +181,7 @@ def get_bowl_properties(mask):
 ALLOWED_PERCENTAGE = 0.75
 
 
-# определяем, с какой стороны от линии находится точка
+# find on which side of the line is the point
 def side_of_line(p1, p2, point):
     x, y = point
     x1, y1 = p1
@@ -193,7 +189,7 @@ def side_of_line(p1, p2, point):
     return (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1)
 
 
-# поиск точек пересечения прямой стола с ограничивающим прямоугольником таза
+# searching the points of intersection of tabletop and bounding box of bowl
 def line_crossing(box, p1, p2):
     line = LineString([p1, p2])
     intersect = Polygon(box).intersection(line)
@@ -204,28 +200,28 @@ def line_crossing(box, p1, p2):
         return None
 
 
-# поиск площади трапеции, лежащей выше прямой стола
+# finding the square of trapezoid, that is above the tabletop line
 def trapezoid_area(rect, p1, p2):
-    # находим координаты пересечения линии с ограничивающим прямоугольником
+    # finding the coordinates of intersection the line with bounding box
     box = np.int0(cv.boxPoints(rect))
     box_tuples = [tuple(elem) for elem in box]
     l1, l2 = line_crossing(box_tuples, p1, p2)
 
-    # координаты линии зададим против часовой стрелки
-    # поскольку box_tuples тоже против часовой стрелки
+    # coordinates should be anti clock-wise
+    # because box_tuples are also anti clock-wise
     polygon = [l2, l1]
 
-    # находим координаты многоугольника, отсекаемого прямой
+    # searching polygon coordinates, that is cutted by straight line
     for p in box_tuples:
         if side_of_line(l1, l2, p) > 0:
             polygon.append(p)
 
-    # находим площадь многоугольника
+    # finding square of polygon
     poly = Polygon(polygon)
     return poly.area
 
 
-# поиск ответа на поставленный вопрос
+# finding the answer for question of full work
 def get_answer(table, bowl):
     angle, dist, p1, p2 = table
     max_p, min_p, rect = bowl
@@ -235,7 +231,6 @@ def get_answer(table, bowl):
     elif side_of_line(p1, p2, max_p) <= 0:
         return True
     else:
-        # на предложенном датасете функция не понадобится
         center, wh, angle = rect
         w, h = wh
         area = w * h
@@ -248,12 +243,12 @@ def get_answer(table, bowl):
 
 def print_answer(answer):
     if answer:
-        print("Таз можно поместить под стол")
+        print("Bowl can be placed under the table")
     else:
-        print("Таз нельзя поместить под стол")
+        print("Bowl cannot be placed under the table")
 
 
-# проверка всех изображений в датасете
+# checking all images in dataset
 def check_data(data):
     for d in data:
         peaks = get_hough_transform(d)
@@ -267,10 +262,10 @@ def check_data(data):
         print_answer(ans)
 
 
-# загрузка данных
+# data loading
 no_data = read_images(no_path)  # 9 images
 yes_data = read_images(yes_path)  # 7 images
-print("Проверка датасета с ответом 'нет':")
+print("Checking dataset with 'no' answer:")
 check_data(no_data)
-print("\nПроверка датасета с ответом 'да':")
+print("\nChecking dataset with 'yes' answer:")
 check_data(yes_data)
