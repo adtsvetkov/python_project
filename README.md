@@ -4,13 +4,13 @@
 ## Abstract
 The name of the project is «Intelligent Placer». Formulation of the problem is given below.  
 
-__Input:__ pictures showing object A – 10 liter plastic lilac pelvis, and object B – a table with table top in dark brown and beige shades, having a set of straight parallel lines on the table top, and 4 glossy metal legs.  
+__Input:__ pictures showing object A – 10 liter plastic lilac bowl, and object B – a table with table top in dark brown and beige shades, having a set of straight parallel lines on the table top, and 4 glossy metal legs.  
 We aim of the project is to understand wether object A can be placed under table B. “Place” means movement of object A in one plane to the area under the table top of object B without deforming object A.  
 
 __Output:__ the answer „yes“ if the object A can be placed under object B, and “no” otherwise.  
 
-__Important note:__ an object A can be placed under the table B if its dimentions are smaller than the distance from the floor to the tabletop. The pelvis satisfies this condition in advance. It is forbidden for pelvis to hang above the table: it can only lie on the floor, in contact or not with the legs, or on the tabletop itself. Thus, the answer "no" is obtained when the pelvis is above the table or at the level of the tabletop. The answer "yes" is obtained when the pelvis is under the table (under the tabletop).  
-In this way the aim of the project is to understand, where is the pelvis: under the table or on the table.  
+__Important note:__ an object A can be placed under the table B if its dimentions are smaller than the distance from the floor to the tabletop. The bowl satisfies this condition in advance. It is forbidden for bowl to hang above the table: it can only lie on the floor, in contact or not with the legs, or on the tabletop itself. Thus, the answer "no" is obtained when the bowl is above the table or at the level of the tabletop. The answer "yes" is obtained when the bowl is under the table (under the tabletop).  
+In this way the aim of the project is to understand, where is the bowl: under the table or on the table.  
 
 ## Design and Technology
 This is computer vision project, so the most of important used libraries are about CV and image processing. These are:  
@@ -28,7 +28,7 @@ __Input data requirements:__
 -	Image format should be Joint Photographic Experts Group (.jpeg, .jpg), aspect ratio 9:16 (landscape). The minimum image size is 360 x 640.
 -	Objects on the photo are clearly distinguishable: sharp, not blurred, in focus, not noisy, there is no retouching; no overexposed or black areas, colors are natural.
 -	The background behind the studied objects is light, contrasting with both objects and their parts.
--	The proportions of objects relative to each other are preserved. The objects are in the photo as a whole, i.e. are not clipped at the edges of the image. Collages of two or more images are not allowed. Both objects (table B and pelvis A) are necessarily present in the image. The table should be close to the wall (background), most of the tabletop should be parallel (or almost parallel) to the wall.
+-	The proportions of objects relative to each other are preserved. The objects are in the photo as a whole, i.e. are not clipped at the edges of the image. Collages of two or more images are not allowed. Both objects (table B and bowl A) are necessarily present in the image. The table should be close to the wall (background), most of the tabletop should be parallel (or almost parallel) to the wall.
 -	Mid-angle optics is required (fish-eye images are not allowed). Images have little or no perspective distortion.
 
 The input labeled data can be founded by following link:  
